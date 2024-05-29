@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar JawaScript</title>
+</head>
+<body>
+    <h1 id="hello">Hello Worlds!</h1>
+    <input type="text" id="nama" placeholder="Nama Lengkap">
+    <input type="text" id="umur" placeholder="Umur">
+    <button onclick="halofunc()" style="background-color: rgba(77, 77, 213, 0.992); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; ">Click me</button>  
+    <script>
+        function halofunc(){
+            let nama = document.getElementById('nama').value;
+            let umur = document.getElementById('umur').value;
+            document.getElementById('hello').innerHTML = 'Hello ' + nama + ' Kamu Berumur ' + umur + ' Tahun';
+            alert(`Hello ${nama} Kamu Berumur ${umur} Tahun`);
+            console.log('Printed.');
+        }
+    </script>
+</body>
+</html>
+

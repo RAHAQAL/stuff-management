@@ -1,0 +1,30 @@
+{
+  "stuff": [
+    {
+      "id": "1afb",
+      "name": "ROG Strix G305l",
+      "price": "1400",
+      "category": "Electronic"
+    },
+    {
+      "id": "a3f1",
+      "name": "Liwet Rice",
+      "price": "1",
+      "category": "Food"
+    }
+  ],
+  "category": [
+    {
+      "id": "1",
+      "name": "Food"
+    },
+    {
+      "id": "8ae1",
+      "name": "Drink"
+    },
+    {
+      "id": "687b",
+      "name": "Electronic"
+    }
+  ]
+}

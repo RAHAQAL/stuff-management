@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Stuff</title>
+    <style>
+      body {
+        background-color: #0F1212;
+        color: #E8ECEC;
+      }
+      input, select {
+        background-color: #0F1212;
+        color: #E8ECEC;
+        border: 1px solid #E8ECEC;
+      }
+      button {
+        background-color: #AEBBBE;
+        color: #0F1212;
+      }
+      
+    </style>
+  </head>
+  <body>
+    <nav class="p-4">
+      <ul class="flex space-x-4">
+        <li>
+          <a href="home.html" class="text-white font-semibold mr-3">Home</a>
+          <a href="category.html" class="text-white font-semibold">Category</a>
+        </li>
+      </ul>
+    </nav>
+    <div class="container mx-auto p-4">
+      <h1 class="text-3xl font-bold mb-4 text-center ">List of Stuff</h1>
+      <div class="mb-4 space-y-2 max-w-md mx-auto">
+        <input type="text" placeholder="Name Of Stuff" id="name" class="border p-2 rounded w-full" />
+        <input type="text" placeholder="Price" id="price" class="border p-2 rounded w-full" />
+        <select id="category" class="border p-2 rounded w-full">
+          <option value="Furniture">Furniture</option>
+          <option value="Electronic">Electronic</option>
+        </select>
+        <button type="button" onclick="SaveStuff()" id="save" class="p-2 rounded w-full">Save</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full bg-white shadow-md rounded">
+          <thead>
+            <tr class="bg-gray-700 text-white">
+              <th class="p-2 w-16 text-center">No.</th>
+              <th class="p-2 text-left">Name</th>
+              <th class="p-2 text-left">Category</th>
+              <th class="p-2 text-right">Price</th>
+              <th class="p-2 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="result" class="bg-white text-gray-900">
+            <!-- This will be populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+      <h1 class="text-2xl font-bold mt-4">Total: $<span id="total-price">0</span></h1>
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+      const GetStuff = async () => {
+        await axios.get('http://localhost:3005/stuff')
+          .then((response) => {
+            console.log(response.data);
+            const stuffs = response.data;
+            let bucket = '';
+            let totalPrice = 0;
+            stuffs.forEach((stuff, index) => {
+              totalPrice += parseFloat(stuff.price);
+              bucket += `
+                      <tr class="border-b">
+                          <td class="p-2 text-center w-16">${index + 1}</td>
+                          <td class="p-2 text-left">${stuff.name}</td>
+                          <td class="p-2 text-left">${stuff.category}</td>
+                          <td class="p-2 text-right">$${stuff.price}</td>
+                          <td class="p-2 text-center space-x-2">
+                            <button type="button" onclick="EditStuff('${stuff.id}')" class="bg-yellow-500 text-#0F1212 p-1 rounded">Edit</button>
+                            <button type="button" onclick="DeleteStuff('${stuff.id}')" class="bg-red-500 text-#0F1212 p-1 rounded">Delete</button>
+                          </td>
+                      </tr>
+                      `;
+            });
+            document.getElementById('result').innerHTML = bucket;
+            document.getElementById('total-price').innerText = totalPrice.toFixed(2);
+          })
+          .catch((error) => {
+            alert(error.message);
+          })
+      }
+      GetStuff();
+
+      const GetCategory = async () => {
+        await axios
+          .get("http://localhost:3005/category")
+          .then((response) => {
+            console.log(response.data);
+            const categories = response.data;
+            let bucket = "";
+            categories.forEach((category, index) => {
+              bucket += `
+              <option value = "${category.name}">${category.name}</option>
+              `;
+            });
+            document.getElementById("category").innerHTML = bucket;
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      };
+      GetCategory();
+
+      const SaveStuff = async () => {
+        let name = document.getElementById("name").value;
+        let price = document.getElementById("price").value;
+        let category = document.getElementById("category").value;
+        await axios
+          .post("http://localhost:3005/stuff", {
+            name: name,
+            price: price,
+            category: category,
+          })
+          .then((response) => {
+            console.log(response);
+            GetStuff();
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      };
+
+      const DeleteStuff = async (id) => {
+        if (confirm("Are you sure"))
+          await axios
+            .delete(`http://localhost:3005/stuff/${id}`)
+            .then((response) => {
+              console.log(response);
+              GetStuff();
+            })
+            .catch((error) => {
+              alert(error.message);
+            });
+      };
+
+      const EditStuff = async (id) => {
+        await axios
+          .get(`http://localhost:3005/stuff/${id}`)
+          .then((response) => {
+            const stuff = response.data;
+            document.getElementById("name").value = stuff.name;
+            document.getElementById("price").value = stuff.price;
+            document.getElementById("category").value = stuff.category;
+            document.getElementById("save").innerText = "Update";
+            document
+              .getElementById("save")
+              .setAttribute("onclick", `UpdateStuff('${id}')`);
+            console.log(response);
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      };
+      const UpdateStuff = async (id) => {
+        let name = document.getElementById("name").value;
+        let price = document.getElementById("price").value;
+        let category = document.getElementById("category").value;
+        await axios
+          .patch(`http://localhost:3005/stuff/${id}`, {
+            name: name,
+            price: price,
+            category: category,
+          })
+          .then((response) => {
+            console.log(response);
+            document.getElementById("name").value = "";
+            document.getElementById("price").value = "";
+            document.getElementById("save").innerText = "Save";
+            document
+              .getElementById("save")
+              .setAttribute("onclick", `SaveStuff()`);
+            GetStuff();
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      };
+    </script>
+  </body>
+</html>
